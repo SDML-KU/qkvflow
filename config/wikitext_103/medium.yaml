@@ -1,0 +1,49 @@
+data:
+  id: dlwh/wikitext_103_detokenized
+  cache_dir: "cache/wikitext"
+
+model:
+  type: gpt2
+  hidden_dim: 1024
+  num_heads: 16
+  num_layers: 24
+  seq_len: 1024
+  gradient_checkpointing: true
+  embed_pdrop: 0.1
+  resid_pdrop: 0.1
+  attn_pdrop: 0.1
+
+trainer:
+  wandb:
+    name: "gpt_small_dropout_0.1"
+    project: "qkvflow"
+    tags: [ "wikitext-103"]
+
+  mp: p=f32,c=bfloat16
+
+  checkpointer: 
+    save_interval: 3h
+    keep:
+      - every: 10000
+        until: 10001
+
+  per_device_eval_parallelism: 1
+  per_device_parallelism: -1
+
+  train_batch_size: 256
+  num_train_steps: 10001
+  steps_per_eval: 200
+
+  tensor_parallel_axes: ["mlp", "heads"]
+  fsdp_axis: "embed"
+  batch_axis: "batch"
+  
+optimizer:
+  learning_rate: 3E-4
+  weight_decay: 0.1
+  min_lr_ratio: 0.1
+
+model_choice: gpt2
+time_embed_dim: 48
+sinusodial_dim: 128
+num_check_points: 5

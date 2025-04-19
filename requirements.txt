@@ -1,0 +1,22 @@
+## dev
+bandit==1.7.5
+black==23.1.0
+flake8==6.0.0
+isort==5.12.0
+mypy==1.1.1
+pytest==7.2.2
+pre-commit==3.2.1
+
+# notebooks specific requirements
+ipykernel==6.22.0
+nbconvert==7.2.10
+nbformat==5.8.0
+
+## main package
+# einops==0.6.1
+# scipy==1.12.0
+# # wandb
+# zstandard
+# # optax
+# matplotlib
+# levanter==1.1

@@ -1,0 +1,50 @@
+data: 
+  id: Skylion007/openwebtext
+  cache_dir: "cache/owt_llama"
+  tokenizer: "NousResearch/Llama-2-7b-hf"
+  stream: False
+
+model:
+  type: llama
+  seq_len: 2048
+  hidden_dim: 2048
+  intermediate_dim: 8192
+  num_layers: 16
+  num_heads: 16
+  gradient_checkpointing: true
+
+trainer:
+  wandb:
+    name: "llama_1b"
+    project: "qkvflow"
+    tags: ["openwebtext", "1b"]
+
+  checkpointer: 
+    save_interval: 5h
+    keep:
+      - every: 40000
+        until: 40001
+
+  per_device_eval_parallelism: 32
+  per_device_parallelism: -1
+
+  train_batch_size: 256
+  num_train_steps: 40001
+  steps_per_eval: 500
+
+  mp: p=f32,c=bfloat16
+
+  tensor_parallel_axes: ["mlp", "heads"]
+  fsdp_axis: "embed"
+  batch_axis: "batch"
+  
+optimizer:
+  learning_rate: 3E-4
+  beta2: 0.95
+  weight_decay: 1e-5
+  min_lr_ratio: 0.1
+  epsilon: 1e-8
+
+model_choice: llama
+time_embed_dim: 96
+sinusodial_dim: 256

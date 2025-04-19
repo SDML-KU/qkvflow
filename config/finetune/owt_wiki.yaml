@@ -1,0 +1,101 @@
+
+# whether `pretrain` or `finetune`
+mode: "pretrain"
+
+# choice: `full` or lora
+finetune_choice: "full"
+
+# in case of finetuning `neuralode`, choose the number of layer for finetune model
+# the equivalent time step for solver will be 1/`finetune_layer`
+finetune_layer: 24
+
+
+# configuration for pretraining step
+pretrain_config:
+
+  data:
+    id: Skylion007/openwebtext
+    cache_dir: "cache/owt"
+    tokenizer: "gpt2"
+    stream: False
+
+  model:
+    type: gpt2
+    hidden_dim: 1024
+    num_heads: 16
+    num_layers: 18   # config the layer of pretrain 
+    seq_len: 1024
+    gradient_checkpointing: true
+    embed_pdrop: 0.1
+    resid_pdrop: 0.1
+    attn_pdrop: 0.1
+
+  trainer:
+
+    # set the id. this id will be the name of folder of checkpoint
+    id: "pretrain_neuralode_on_owt"
+    wandb:
+      name: "pretrain_neuralode_on_owt"
+      project: "iclr2024-qkvflow"
+      tags: ["wikitext-103"]
+      # mode: "disabled"
+
+    checkpointer: 
+      keep:
+        - every: 10000
+          until: 10001
+
+    per_device_eval_parallelism: 32
+    per_device_parallelism: -1
+
+    mp: p=f32,c=bfloat16
+
+    train_batch_size: 256
+    num_train_steps: 10001
+    steps_per_eval: 200
+    
+  optimizer:
+    learning_rate: 3E-4
+    weight_decay: 0.1
+    min_lr_ratio: 0.1
+
+  model_choice: neuralode
+  time_embed_dim: 100
+  sinusodial_dim: 256
+
+
+# config of fine-tuning step
+finetune_data:
+  id: dlwh/wikitext_103_detokenized
+  cache_dir: "cache/wikitext"
+
+finetuner:
+  wandb:
+    id: "finetune_neural_on_wiki"
+    name: "finetune_neural_on_wiki"
+    project: "iclr2024-qkvflow"
+    tags: ["finetune", "owt_wiki"]
+
+  checkpointer: 
+    keep:
+      - every: 10000
+        until: 10001
+
+  load_checkpoint: false
+
+  per_device_eval_parallelism: 32
+  per_device_parallelism: -1
+
+  mp: p=f32,c=bfloat16
+
+  train_batch_size: 256
+  num_train_steps: 10001
+  steps_per_eval: 200
+
+lora:
+  r: 200
+
+lora_optimizer:
+  learning_rate: 3E-4
+  weight_decay: 0.1
+  min_lr_ratio: 0.1

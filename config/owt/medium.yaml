@@ -1,0 +1,50 @@
+data: 
+  id: Skylion007/openwebtext
+  cache_dir: "cache/owt"
+  tokenizer: "gpt2"
+  stream: False
+
+model:
+  type: gpt2
+  hidden_dim: 1024
+  num_heads: 16
+  num_layers: 24
+  seq_len: 1024
+  gradient_checkpointing: true
+  embed_pdrop: 0.1
+  resid_pdrop: 0.1
+  attn_pdrop: 0.1
+trainer:
+  wandb:
+    name: "our_wikitext_medium"
+    project: "qkvflow"
+    tags: ["openwebtext", "medium"]
+
+  checkpointer: 
+    save_interval: 5h
+    keep:
+      - every: 40000
+        until: 40001
+
+  per_device_eval_parallelism: 32
+  per_device_parallelism: -1
+
+  train_batch_size: 256
+  num_train_steps: 40001
+  steps_per_eval: 500
+
+  mp: p=f32,c=bfloat16
+
+  tensor_parallel_axes: ["mlp", "heads"]
+  fsdp_axis: "embed"
+  batch_axis: "batch"
+  
+optimizer:
+  learning_rate: 3E-4
+  weight_decay: 0.1
+  min_lr_ratio: 0.1
+
+model_choice: neuralode
+time_embed_dim: 96
+sinusodial_dim: 128
+num_check_points: 5
